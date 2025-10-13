@@ -1,40 +1,40 @@
-import { BrowserRouter, Routes, Route } from "react-router";
-import { AuthPage } from "../pages";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { PrivateRoutes, PublicRoutes } from "./router/router";
 import { PAGE_ENDPOINTS } from "./config/pageEnpoints";
-import { RegisterPage } from "../pages/registerPage";
-import { AuthContext, AuthProvider } from "../entites";
-import { TasksPage } from "../pages/tasksPage";
-import { useContext } from "react";
+import { useInitSession } from "../entites/user/hooks/useInitSession";
+import { CircularProgress } from "@mui/material";
+import { useUserStore } from "../entites";
 
 const Router = () => {
-  const context = useContext(AuthContext);
-  if (context && context.isAuthenticated) {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route index path={PAGE_ENDPOINTS.tasks} element={<TasksPage />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  } else {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<AuthPage />} />
-          <Route path={PAGE_ENDPOINTS.login} element={<AuthPage />} />
-          <Route path={PAGE_ENDPOINTS.register} element={<RegisterPage />} />
-        </Routes>
-      </BrowserRouter>
-    );
+  useInitSession();
+  const isInitialized = useUserStore((state) => state.isInitialized);
+
+  if (!isInitialized) {
+    return <CircularProgress />;
   }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {PrivateRoutes()}
+
+        {PublicRoutes()}
+
+        <Route
+          path="/"
+          element={<Navigate to={PAGE_ENDPOINTS.quiz} replace />}
+        />
+        <Route
+          path="*"
+          element={<Navigate to={PAGE_ENDPOINTS.login} replace />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 function App() {
-  return (
-    <AuthProvider>
-      <Router />
-    </AuthProvider>
-  );
+  return <Router />;
 }
 
 export default App;

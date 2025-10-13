@@ -10,13 +10,12 @@ export const privateEndpoints = {
     me: "user/me",
     logout: "user/logout",
   },
-  tasks: {
-    getList: "task/get_list",
-    create: "task/create",
-    delete: "task/delete/",
-    update: "task/update/",
-  },
   categories: {
-    getCategories: "category/get_list",
+    getCategories: "categories/list",
+  },
+  quiz: {
+    getPulbicRooms: "rooms/list",
+    createRoom: "rooms/create",
+    connectToRoom: "rooms/join",
   },
 };

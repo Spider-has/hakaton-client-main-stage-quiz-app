@@ -1,7 +1,12 @@
 export const PAGE_ENDPOINTS = {
   login: "/login",
   register: "/register",
-  tasks: "/tasks",
+  quiz: "/quiz",
+  room: {
+    base: "room",
+    createRoom: "create-room",
+    usersRoom: ":id",
+  },
 };
 
 export const pulbicPages = [PAGE_ENDPOINTS.login, PAGE_ENDPOINTS.register];

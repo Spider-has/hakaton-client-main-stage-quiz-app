@@ -1,3 +1,3 @@
 export * from "./authPage/index";
 export * from "./registerPage";
-export * from "./tasksPage";
+export * from "./quizPage";

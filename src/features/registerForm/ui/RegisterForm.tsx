@@ -2,30 +2,31 @@ import { Link, Paper, Typography } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router";
 import { PAGE_ENDPOINTS } from "../../../app/config/pageEnpoints";
 import { UserForm, useTextFieldState } from "../../../shared";
-import { useContext, useCallback } from "react";
-import { AuthContext, registerRequest } from "../../../entites";
+import { useCallback } from "react";
+import { userApi, useUserStore } from "../../../entites";
 
 export const RegisterForm = () => {
   const [login, setLogin] = useTextFieldState("");
   const [password, setPassword] = useTextFieldState("");
 
-  const context = useContext(AuthContext);
-
+  const userLogin = useUserStore((state) => state.login);
+  const userError = useUserStore((state) => state.error);
   const navigate = useNavigate();
 
   const onSubmit = useCallback(async () => {
-    if (context && login.length > 0 && password.length) {
+    if (login.length > 0 && password.length) {
       try {
-        const response = await registerRequest(login, password);
+        const response = await userApi.register({ login, password });
         if (response.ok) {
-          const success = await context.login(login, password);
-          if (success) navigate(PAGE_ENDPOINTS.tasks);
+          await userLogin({ login, password });
+          navigate(PAGE_ENDPOINTS.quiz);
         }
       } catch (err) {
-        console.error(err);
+        console.error(userError);
       }
     }
-  }, [context, login, password]);
+  }, [userLogin, login, password]);
+
   return (
     <Paper
       elevation={3}

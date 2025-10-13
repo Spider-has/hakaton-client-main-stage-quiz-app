@@ -31,3 +31,14 @@ export const publicFetch = async (
 
   return response;
 };
+
+export const handleResponse = async <T>(response: Response): Promise<T> => {
+  if (!response.ok) {
+    const errorMessage =
+      response.status === 401
+        ? "Unauthorized"
+        : `HTTP ${response.status}: ${response.statusText}`;
+    throw new Error(errorMessage);
+  }
+  return response.json() as Promise<T>;
+};
