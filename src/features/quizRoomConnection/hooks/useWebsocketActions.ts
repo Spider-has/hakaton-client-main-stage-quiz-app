@@ -5,6 +5,7 @@ export type QuizRoomActions = {
   submitAnswer: (questionId: string, answerId: string) => void;
   sendReadySignal: (playerId: string) => void;
   leaveRoom: () => void;
+  getAllPlayerInRoom: (room_id: string) => void;
 };
 
 export const getQuizSocketActions = (
@@ -20,13 +21,18 @@ export const getQuizSocketActions = (
 
   const leaveRoom = () => {
     socketRef.current?.emit("player_leave", {});
-    socketRef.current?.disconnect();
+  };
+
+  const getAllPlayerInRoom = (room_id: string) => {
+    console.log(room_id);
+    socketRef.current?.emit("all_players_in_lobby", { room_id });
   };
 
   return {
     submitAnswer,
     sendReadySignal,
     leaveRoom,
+    getAllPlayerInRoom,
   };
 };
 

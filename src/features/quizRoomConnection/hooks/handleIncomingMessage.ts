@@ -11,6 +11,7 @@ export const handleIncomingEvents = (socket: QuizSocket) => {
     removePlayer,
     startQuiz,
     setError,
+    setPlayers,
   } = useQuizRoomStore.getState();
 
   socket.on("question_changed", (question: Question) => {
@@ -18,18 +19,23 @@ export const handleIncomingEvents = (socket: QuizSocket) => {
   });
 
   socket.on("player_joined", (player: Player) => {
-    addPlayer(player); // player: Player
+    addPlayer(player);
+  });
+
+  socket.on("all_players_in_lobby", ({ players }) => {
+    console.log(players);
+    setPlayers(players);
   });
 
   socket.on("player_leave", (playerId) => {
-    removePlayer(playerId); // playerId: string
+    removePlayer(playerId);
   });
 
   socket.on("quiz_started", () => {
-    startQuiz(); // payload: Record<string, never> — можно игнорировать
+    startQuiz();
   });
 
   socket.on("error", (message) => {
-    setError(message); // message: string
+    setError(message);
   });
 };

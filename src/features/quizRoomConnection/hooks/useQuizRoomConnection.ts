@@ -8,7 +8,10 @@ import type { Socket } from "socket.io-client";
 import { handleIncomingEvents } from "./handleIncomingMessage";
 import { createQuizSocket } from "../socket/socket";
 
-export const useQuizRoomConnection = (roomId: string): QuizRoomActions => {
+export const useQuizRoomConnection = (
+  roomId: string,
+  userId: string
+): QuizRoomActions => {
   const { setRoomId, reset, setIsConnected, setError } = useQuizRoomStore();
 
   const socketRef = useRef<Socket | null>(null);
@@ -29,6 +32,13 @@ export const useQuizRoomConnection = (roomId: string): QuizRoomActions => {
       setError("Connection failed");
     });
 
+    const handleConnect = () => {
+      console.log("Socket connected");
+      socket.emit("join_room", { room_id: roomId, user_id: userId });
+    };
+
+    socket.on("connect", handleConnect);
+
     handleIncomingEvents(socket);
 
     return () => {
@@ -37,7 +47,7 @@ export const useQuizRoomConnection = (roomId: string): QuizRoomActions => {
       reset();
     };
   }, [roomId, setRoomId, setIsConnected, setError, reset]);
-
   const actions = getQuizSocketActions(socketRef);
+
   return actions;
 };

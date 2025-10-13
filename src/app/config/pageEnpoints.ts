@@ -5,7 +5,7 @@ export const PAGE_ENDPOINTS = {
   room: {
     base: "room",
     createRoom: "create-room",
-    usersRoom: ":id",
+    usersRoom: ":code",
   },
 };
 

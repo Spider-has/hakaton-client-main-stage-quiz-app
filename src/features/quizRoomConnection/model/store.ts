@@ -1,5 +1,4 @@
-import type { Player } from "./player";
-import type { Question } from "./question";
+import type { Player, Question } from "./messages";
 
 export interface QuizRoomState {
   roomId: string | null;
@@ -8,9 +7,12 @@ export interface QuizRoomState {
 
   currentQuestion: Question | null;
   players: Player[];
+  owner: Player | null;
   isQuizStarted: boolean;
 
   setRoomId: (id: string) => void;
+  setRoomOwner: (player: Player) => void;
+  setPlayers: (players: Player[]) => void;
   setIsConnected: (connected: boolean) => void;
   setError: (error: string | null) => void;
   reset: () => void;

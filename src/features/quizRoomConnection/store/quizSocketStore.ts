@@ -7,9 +7,11 @@ export const useQuizRoomStore = create<QuizRoomState>((set) => ({
   error: null,
   currentQuestion: null,
   players: [],
+  owner: null,
   isQuizStarted: false,
 
   setRoomId: (id) => set({ roomId: id }),
+  setRoomOwner: (player) => set({ owner: player }),
   setIsConnected: (connected) => set({ isConnected: connected }),
   setError: (error) => set({ error }),
   reset: () =>
@@ -27,9 +29,11 @@ export const useQuizRoomStore = create<QuizRoomState>((set) => ({
   addPlayer: (player) =>
     set((state) => ({ players: [...state.players, player] })),
 
+  setPlayers: (players) => set({ players }),
+
   removePlayer: (playerId) =>
     set((state) => ({
-      players: state.players.filter((p) => p.id !== playerId),
+      players: state.players.filter((p) => p.user_id !== playerId),
     })),
 
   startQuiz: () => set({ isQuizStarted: true }),
