@@ -27,11 +27,9 @@ export default function QuizPageComponent() {
 
   const joinByRoomCodeHandler = async (code: string) => {
     try {
-      const roomId = await tryJoinToRoom(code);
-      console.log(roomId);
-      if (roomId) {
+      const roomRes = await tryJoinToRoom(code);
+      if (roomRes.ok || roomRes.status === 409)
         navigate(PAGE_ENDPOINTS.room.base + `/${code}`);
-      }
     } catch (err) {
       console.error(err);
     }

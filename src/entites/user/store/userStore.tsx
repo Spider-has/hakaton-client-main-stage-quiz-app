@@ -18,7 +18,7 @@ export const useUserStore = create<UserState>((set) => ({
       await userApi.login(userInputData);
       const userDTO = await userApi.getProfile();
       const user: User = {
-        id: userDTO.id,
+        id: userDTO.user_id,
         name: userDTO.login,
       };
       set({ user, loading: false });
@@ -47,7 +47,7 @@ export const useUserStore = create<UserState>((set) => ({
     try {
       const userDto = await userApi.getProfile();
       const user: User = {
-        id: userDto.id,
+        id: userDto.user_id,
         name: userDto.login,
       };
       set({ user, loading: false, isInitialized: true });

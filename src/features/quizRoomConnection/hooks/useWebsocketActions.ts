@@ -24,7 +24,7 @@ export const getQuizSocketActions = (
   };
 
   const getAllPlayerInRoom = (room_id: string) => {
-    console.log(room_id);
+    console.log("get players in room: " + room_id);
     socketRef.current?.emit("all_players_in_lobby", { room_id });
   };
 

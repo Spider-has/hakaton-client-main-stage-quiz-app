@@ -17,16 +17,4 @@ export const useRoomStore = create<RoomStore>((set) => ({
       alert(message);
     }
   },
-
-  joinRoomByCode: async (code: string) => {
-    console.log("Joining room by code:", code);
-  },
-
-  joinRoomById: async (roomId: string) => {
-    console.log("Joining room by ID:", roomId);
-  },
-
-  createRoom: async () => {
-    console.log("Creating new room...");
-  },
 }));

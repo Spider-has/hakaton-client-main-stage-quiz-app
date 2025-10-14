@@ -30,18 +30,12 @@ export const mapRoomsDTOtoRoom = (data: RoomDTO[]): Room[] => {
   }));
 };
 
-type JoinRoom = {
-  room_id: string;
-};
-
-export const tryJoinToRoom = async (code: string): Promise<JoinRoom> => {
+export const tryJoinToRoom = async (code: string): Promise<Response> => {
   const res = await publicFetch(privateEndpoints.quiz.connectToRoom, {
     method: "POST",
     body: {
       code,
     },
   });
-  const data = await res.json();
-  console.log(data);
-  return handleResponse<JoinRoom>(res);
+  return res;
 };

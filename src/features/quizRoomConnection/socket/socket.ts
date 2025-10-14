@@ -3,15 +3,15 @@ import type {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../model/messages";
+import { WEBSOCKET_URL } from "../../../shared";
 
-const websocketURL = "ws://localhost:5000/";
 export type QuizSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export const createQuizSocket = (
   roomId: string,
   token?: string
 ): QuizSocket => {
-  return io(websocketURL, {
+  return io(WEBSOCKET_URL, {
     query: { roomId },
     withCredentials: true,
     auth: token ? { token } : undefined,

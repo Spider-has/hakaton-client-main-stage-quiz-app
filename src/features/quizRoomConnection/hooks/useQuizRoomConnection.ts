@@ -4,20 +4,19 @@ import {
   getQuizSocketActions,
   type QuizRoomActions,
 } from "./useWebsocketActions";
-import type { Socket } from "socket.io-client";
 import { handleIncomingEvents } from "./handleIncomingMessage";
-import { createQuizSocket } from "../socket/socket";
+import { createQuizSocket, type QuizSocket } from "../socket/socket";
 
 export const useQuizRoomConnection = (
-  roomId: string,
-  userId: string
+  roomId: string | null,
+  userId: string | null
 ): QuizRoomActions => {
   const { setRoomId, reset, setIsConnected, setError } = useQuizRoomStore();
 
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<QuizSocket | null>(null);
 
   useEffect(() => {
-    setRoomId(roomId);
+    if (!roomId || !userId) return;
 
     const socket = createQuizSocket(roomId);
     socketRef.current = socket;
@@ -35,18 +34,20 @@ export const useQuizRoomConnection = (
     const handleConnect = () => {
       console.log("Socket connected");
       socket.emit("join_room", { room_id: roomId, user_id: userId });
+      setIsConnected(true);
     };
 
     socket.on("connect", handleConnect);
 
-    handleIncomingEvents(socket);
+    handleIncomingEvents(socketRef);
 
     return () => {
       socket.disconnect();
       socketRef.current = null;
       reset();
     };
-  }, [roomId, setRoomId, setIsConnected, setError, reset]);
+  }, [roomId, userId, setRoomId, setIsConnected, setError, reset]);
+
   const actions = getQuizSocketActions(socketRef);
 
   return actions;

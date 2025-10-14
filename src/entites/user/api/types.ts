@@ -1,5 +1,5 @@
 export type UserDTO = {
-  id: string;
+  user_id: string;
   login: string;
 };
 

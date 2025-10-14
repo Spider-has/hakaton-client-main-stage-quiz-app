@@ -1,17 +1,34 @@
 import { create } from "zustand";
-import type { QuizRoomState } from "../model/store";
+import { RoomStatus, type QuizRoomState } from "../model/store";
+import type { Question } from "../model/messages";
+
+const sampleQuestion: Question = {
+  id: "q-001",
+  text: "Какой язык программирования используется для написания React-компонентов?",
+  options: [
+    { id: "opt-1", text: "Java" },
+    { id: "opt-2", text: "Python" },
+    { id: "opt-3", text: "JavaScript" },
+    { id: "opt-4", text: "C++" },
+  ],
+};
 
 export const useQuizRoomStore = create<QuizRoomState>((set) => ({
   roomId: null,
+  roomCode: null,
   isConnected: false,
   error: null,
-  currentQuestion: null,
+  currentQuestion: sampleQuestion,
   players: [],
   owner: null,
   isQuizStarted: false,
 
+  status: RoomStatus.QUESTION,
+
   setRoomId: (id) => set({ roomId: id }),
+  setRoomCode: (code) => set({ roomId: code }),
   setRoomOwner: (player) => set({ owner: player }),
+  setRoomStatus: (status) => set({ status }),
   setIsConnected: (connected) => set({ isConnected: connected }),
   setError: (error) => set({ error }),
   reset: () =>
