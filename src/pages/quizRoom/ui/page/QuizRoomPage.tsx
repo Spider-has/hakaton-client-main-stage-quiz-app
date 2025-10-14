@@ -6,7 +6,7 @@ import {
   useQuizRoomConnection,
   useQuizRoomStore,
 } from "../../../../features";
-import { PlayerList, QuizRoomArea, RoomCodeCard } from "../../../../widgets";
+import { AnswerReviewArea, PlayerList, QuizRoomArea, RoomCodeCard } from "../../../../widgets";
 import { useEffect, useState } from "react";
 import { useUserStore } from "../../../../entites";
 import { getRoomIdResponse } from "../../../../features/quizRoomConnection/api/getRoomId";
@@ -47,7 +47,6 @@ export default function QuizRoomPageComponent() {
     }
   }, [error]);
 
-  console.log(code, roomId, user);
 
   const actions = useQuizRoomConnection(roomId, user?.id ?? null);
 
@@ -57,9 +56,25 @@ export default function QuizRoomPageComponent() {
   }, [roomId, isConnected]);
 
   const players = useQuizRoomStore((state) => state.players);
-  console.log(players);
 
   const roomStatus = useQuizRoomStore((store) => store.status);
+  const roomOwner = useQuizRoomStore(state => state.owner)
+
+
+  const leaveRoomHandler = () => {
+    if(roomId && user){
+      actions.leaveRoom()
+      navigate(PAGE_ENDPOINTS.quiz)
+    }
+  }
+
+  const startRoomHandler = () => {
+    if(roomId && user && roomOwner){
+      if(roomOwner.user_id == user.id){
+        actions.startGame(roomId, user.id)
+      }
+    }
+  }
 
   return (
     <QuizRoomContext.Provider value={actions}>
@@ -90,9 +105,17 @@ export default function QuizRoomPageComponent() {
               <Box sx={{ width: 220 }} />
               <PlayerList
                 players={players}
-                handleStartQuiz={() => {}}
-                handleLeaveRoom={() => {}}
-              />
+                handleStartQuiz={startRoomHandler}
+                handleLeaveRoom={leaveRoomHandler} owner={roomOwner ?? {
+                   hasAnsweredCorrectly: false,
+                  user_id: "",
+                  username: "",
+                  score: 0,
+                  correct: 0,
+                  answered: false,
+                  answer: "",
+                  joined_at: ""
+                }}           />
               <RoomCodeCard roomCode={code} />
             </Box>
             <Box
@@ -107,13 +130,22 @@ export default function QuizRoomPageComponent() {
               <RoomCodeCard roomCode={code} />
               <PlayerList
                 players={players}
-                handleStartQuiz={() => {}}
-                handleLeaveRoom={() => {}}
-              />
+                handleStartQuiz={startRoomHandler}
+                handleLeaveRoom={leaveRoomHandler} owner={ roomOwner ?? {
+                  hasAnsweredCorrectly: false,
+                  user_id: "",
+                  username: "",
+                  score: 0,
+                  correct: 0,
+                  answered: false,
+                  answer: "",
+                  joined_at: ""
+                }}              />
             </Box>
           </>
         )}
         {roomStatus === RoomStatus.QUESTION && <QuizRoomArea />}
+        {roomStatus === RoomStatus.CHECK_CORRECT_ANSWERS && <AnswerReviewArea/>}
         {roomStatus === RoomStatus.FINISHED && <></>}
       </Container>
     </QuizRoomContext.Provider>

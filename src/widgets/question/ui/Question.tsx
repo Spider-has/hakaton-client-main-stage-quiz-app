@@ -8,19 +8,54 @@ import {
   AlertTitle,
   Button,
 } from "@mui/material";
-import { type Question } from "../../../features";
-import { useCallback, useEffect, useState } from "react";
+import { type Question as BackendQuestion } from "../../../features";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+const simpleHash = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; 
+  }
+  return Math.abs(hash).toString();
+};
+
+interface FrontendOption {
+  id: string;
+  text: string;
+}
+
+interface FrontendQuestion {
+  id: string; 
+  text: string;
+  options: FrontendOption[];
+}
+
+const toFrontendQuestion = (backendQuestion: BackendQuestion): FrontendQuestion => {
+  return {
+    id: backendQuestion.id,
+    text: backendQuestion.text,
+    options: backendQuestion.options.map((opt) => ({
+      id: simpleHash(opt), 
+      text: opt,
+    })),
+  };
+};
 
 interface CurrentQuestionProps {
-  question: Question;
+  question: BackendQuestion;
   hasSubmittedAnswer?: boolean;
-  onAnswerSubmit?: (questionId: string, optionId: string) => void;
+  onAnswerSubmit?: (answer: string) => void; 
 }
+
 export const CurrentQuestion = ({
   question,
   hasSubmittedAnswer = false,
   onAnswerSubmit,
 }: CurrentQuestionProps) => {
+
+  const frontendQuestion = useMemo(() => toFrontendQuestion(question), [question]);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -34,7 +69,7 @@ export const CurrentQuestion = ({
       setSelectedOptionId(null);
       setSubmitError(null);
     }
-  }, [question.id, hasSubmittedAnswer]);
+  }, [frontendQuestion.id, hasSubmittedAnswer]); 
 
   const handleOptionSelect = useCallback(
     (optionId: string) => {
@@ -48,8 +83,17 @@ export const CurrentQuestion = ({
   const handleSendAnswer = () => {
     if (!selectedOptionId || !onAnswerSubmit) return;
 
+    const selectedOption = frontendQuestion.options.find(
+      (opt) => opt.id === selectedOptionId
+    );
+
+    if (!selectedOption) {
+      setSubmitError("Выбранный вариант не найден.");
+      return;
+    }
+
     try {
-      onAnswerSubmit(question.id, selectedOptionId);
+      onAnswerSubmit(selectedOption.text);
       setIsSubmitted(true);
       setSubmitError(null);
     } catch (err) {
@@ -63,14 +107,14 @@ export const CurrentQuestion = ({
   return (
     <Paper sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        {question.text}
+        {frontendQuestion.text}
       </Typography>
 
       {(isSubmitted || hasSubmittedAnswer) && selectedOptionId && (
         <Alert severity="success" sx={{ mb: 2 }}>
           <AlertTitle>Ответ отправлен</AlertTitle>
           Вы выбрали: «
-          {question.options.find((opt) => opt.id === selectedOptionId)?.text}»
+          {frontendQuestion.options.find((opt) => opt.id === selectedOptionId)?.text}»
         </Alert>
       )}
 
@@ -83,7 +127,7 @@ export const CurrentQuestion = ({
       {!isSubmitted && !hasSubmittedAnswer && (
         <>
           <List sx={{ pl: 0, mb: 2 }}>
-            {question.options.map((option) => (
+            {frontendQuestion.options.map((option) => (
               <ListItem key={option.id} disablePadding sx={{ mb: 1 }}>
                 <ListItemButton
                   selected={selectedOptionId === option.id}

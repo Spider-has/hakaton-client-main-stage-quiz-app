@@ -1,24 +1,12 @@
 import { create } from "zustand";
 import { RoomStatus, type QuizRoomState } from "../model/store";
-import type { Question } from "../model/messages";
 
-const sampleQuestion: Question = {
-  id: "q-001",
-  text: "Какой язык программирования используется для написания React-компонентов?",
-  options: [
-    { id: "opt-1", text: "Java" },
-    { id: "opt-2", text: "Python" },
-    { id: "opt-3", text: "JavaScript" },
-    { id: "opt-4", text: "C++" },
-  ],
-};
-
-export const useQuizRoomStore = create<QuizRoomState>((set) => ({
+export const useQuizRoomStore = create<QuizRoomState>((set, get) => ({
   roomId: null,
   roomCode: null,
   isConnected: false,
   error: null,
-  currentQuestion: sampleQuestion,
+  currentQuestion: null,
   players: [],
   owner: null,
   isQuizStarted: false,
@@ -31,6 +19,7 @@ export const useQuizRoomStore = create<QuizRoomState>((set) => ({
   setRoomStatus: (status) => set({ status }),
   setIsConnected: (connected) => set({ isConnected: connected }),
   setError: (error) => set({ error }),
+  
   reset: () =>
     set({
       roomId: null,
@@ -41,17 +30,59 @@ export const useQuizRoomStore = create<QuizRoomState>((set) => ({
       isQuizStarted: false,
     }),
 
+   updatePlayers: (updatedPlayers) => {
+    const currentPlayers = get().players;
+
+    const updatedMap = new Map(updatedPlayers.map(p => [p.user_id, p]));
+
+    const nextPlayers = currentPlayers.map(player =>
+    {
+      if  (updatedMap.has(player.user_id)){
+    const newdata = updatedMap.get(player.user_id) 
+    return {...player, score: newdata?.score ?? player.score}}
+    return player
+    }
+    );
+
+    set({ players: nextPlayers });
+  },
+
+
+  setPlayerAnswerStatus: (playerId: string, isCorrect: boolean) => {
+    console.log('try to set answered player. ', playerId, isCorrect)
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.user_id === playerId
+          ? { ...player, hasAnsweredCorrectly: isCorrect, answered: true }
+          : player
+      ),
+    }))
+  },
+
+  saveUserAnswer: (playerId: string, answer: string) => {
+    console.log('try to save user answer. ', playerId, answer)
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.user_id === playerId
+          ? { ...player, answer: answer }
+          : player
+      ),
+    }))
+  },
+
+  resetAllUsersAnswersData: () => {
+    set(state => ({
+      players: state.players.map((player) => ({
+        ...player,
+        hasAnsweredCorrectly: false,
+        answer: "",
+        answered: false,
+      }))
+    }))
+  },
   updateCurrentQuestion: (question) => set({ currentQuestion: question }),
 
-  addPlayer: (player) =>
-    set((state) => ({ players: [...state.players, player] })),
-
   setPlayers: (players) => set({ players }),
-
-  removePlayer: (playerId) =>
-    set((state) => ({
-      players: state.players.filter((p) => p.user_id !== playerId),
-    })),
 
   startQuiz: () => set({ isQuizStarted: true }),
 }));

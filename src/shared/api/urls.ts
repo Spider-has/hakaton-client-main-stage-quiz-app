@@ -6,7 +6,7 @@ console.log(env_URL);
 
 const default_websocket_url = "ws://localhost:5000/";
 const env_websocket_url = import.meta.env.VITE_WEBSOCKET_URL;
-export const WEBSOCKET_URL = default_websocket_url ?? env_websocket_url;
+export const WEBSOCKET_URL = env_websocket_url ?? default_websocket_url;
 console.log(env_websocket_url);
 
 export const publicEndpoints = {

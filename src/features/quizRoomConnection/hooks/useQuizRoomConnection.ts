@@ -39,7 +39,7 @@ export const useQuizRoomConnection = (
 
     socket.on("connect", handleConnect);
 
-    handleIncomingEvents(socketRef);
+    handleIncomingEvents(socketRef, roomId);
 
     return () => {
       socket.disconnect();

@@ -2,17 +2,18 @@ import { createContext, useContext } from "react";
 import type { QuizSocket } from "../socket/socket";
 
 export type QuizRoomActions = {
-  submitAnswer: (questionId: string, answerId: string) => void;
+  submitAnswer: (room_id: string, user_id: string, answer: string) => void;
   sendReadySignal: (playerId: string) => void;
   leaveRoom: () => void;
   getAllPlayerInRoom: (room_id: string) => void;
+  startGame: (room_id: string, user_id: string) => void;
 };
 
 export const getQuizSocketActions = (
   socketRef: React.RefObject<QuizSocket | null>
 ): QuizRoomActions => {
-  const submitAnswer = (questionId: string, answerId: string) => {
-    socketRef.current?.emit("answer_submitted", { questionId, answerId });
+  const submitAnswer = (room_id: string, user_id: string, answer: string) => {
+    socketRef.current?.emit("answer", { room_id, user_id, answer });
   };
 
   const sendReadySignal = (playerId: string) => {
@@ -20,7 +21,7 @@ export const getQuizSocketActions = (
   };
 
   const leaveRoom = () => {
-    socketRef.current?.emit("player_leave", {});
+    socketRef.current?.emit("leave_room", {});
   };
 
   const getAllPlayerInRoom = (room_id: string) => {
@@ -28,11 +29,16 @@ export const getQuizSocketActions = (
     socketRef.current?.emit("all_players_in_lobby", { room_id });
   };
 
+  const startGame = (room_id: string, user_id: string) => {
+    socketRef.current?.emit("start_quiz", {room_id, user_id});
+  };
+
   return {
     submitAnswer,
     sendReadySignal,
     leaveRoom,
     getAllPlayerInRoom,
+    startGame
   };
 };
 

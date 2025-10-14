@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Button,
   List,
   ListItem,
@@ -10,35 +11,29 @@ import {
 } from "@mui/material";
 import type { Player } from "../../../features";
 import { PaperBlock } from "./Paper";
+import { useUserStore } from "../../../entites";
 
 interface PlayerListProps {
   players: Player[];
+  owner: Player;
   handleStartQuiz: () => void;
   handleLeaveRoom: () => void;
 }
 
 export const PlayerList = (props: PlayerListProps) => {
-  const { players } = props;
+  const { players, owner,handleLeaveRoom, handleStartQuiz } = props;
 
-  // const user = useUserStore((state) => state.user);
+  const user = useUserStore((state) => state.user);
+
+  const host = owner;
+  const isCurrentUserHost = (user?.id ?? "") === host.user_id
+  
   const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((part) => part[0]?.toUpperCase())
       .join("")
       .substring(0, 2);
-  };
-
-  const isCurrentUserHost = false;
-  // const host = players.find((p) => p.isHost);
-  // const participants = players.filter((p) => !p.isHost);
-
-  const handleStartQuiz = () => {
-    console.log("Начать квиз");
-  };
-
-  const handleLeaveRoom = () => {
-    console.log("Покинуть комнату");
   };
 
   return (
@@ -48,7 +43,7 @@ export const PlayerList = (props: PlayerListProps) => {
       <Typography variant="h6" gutterBottom>
         Организатор
       </Typography>
-      {/* {host && (
+      {host && (
         <ListItem>
           <ListItemAvatar>
             <Avatar sx={{ bgcolor: "primary.main" }}>
@@ -58,7 +53,7 @@ export const PlayerList = (props: PlayerListProps) => {
           <ListItemText primary={host.username} />
           <Box sx={{ color: "text.secondary", ml: 1 }}>👑</Box>
         </ListItem>
-      )} */}
+      )}
 
       {players.length > 0 && (
         <>
@@ -75,7 +70,7 @@ export const PlayerList = (props: PlayerListProps) => {
                     minWidth: 32,
                     textAlign: "center",
                     color: "primary.main",
-                    fontSize: "1.125rem", // ~18px
+                    fontSize: "1.125rem", 
                     mr: 1.5,
                   }}
                 >
@@ -86,7 +81,7 @@ export const PlayerList = (props: PlayerListProps) => {
                     {getInitials(player.username)}
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={player.username} />
+                <ListItemText primary={player.user_id == (user?.id ?? "") ? player.username + " (Вы)" : player.username} />
               </ListItem>
             ))}
           </List>
