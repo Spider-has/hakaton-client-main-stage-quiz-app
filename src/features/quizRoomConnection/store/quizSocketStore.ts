@@ -23,7 +23,7 @@ export const useQuizRoomStore = create<QuizRoomState>((set) => ({
   owner: null,
   isQuizStarted: false,
 
-  status: RoomStatus.QUESTION,
+  status: RoomStatus.WAITING,
 
   setRoomId: (id) => set({ roomId: id }),
   setRoomCode: (code) => set({ roomId: code }),
