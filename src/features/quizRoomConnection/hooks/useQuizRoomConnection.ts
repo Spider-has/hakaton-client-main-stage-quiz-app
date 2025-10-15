@@ -37,7 +37,7 @@ export const useQuizRoomConnection = (
       setIsConnected(true);
     };
 
-    socket.on("connect", handleConnect);
+    socket.on("connect", handleConnect); 
 
     handleIncomingEvents(socketRef, roomId);
 

@@ -7,6 +7,8 @@ type RoomDTO = {
   player_count: number;
   max_players: number;
   room_code: string;
+  category_names: string[];
+  question_count: number;
 };
 
 type GetRoomsDTO = {
@@ -27,6 +29,8 @@ export const mapRoomsDTOtoRoom = (data: RoomDTO[]): Room[] => {
     currentPlayers: el.player_count,
     maxPlayers: el.max_players,
     code: el.room_code,
+    categories: el.category_names,
+    questions: el.question_count
   }));
 };
 

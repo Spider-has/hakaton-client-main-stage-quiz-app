@@ -1,3 +1,5 @@
+import type { RoomStatuses } from "./store";
+
 export type Question = {
   id: string,
   text: string,
@@ -5,6 +7,7 @@ export type Question = {
   correct_answer: string
   time_limit: number
   category_id: string,
+  position: number,
 };
 
 export type Player = {
@@ -28,16 +31,16 @@ export type PlayerLeaderBoard = {
 export interface ClientToServerEvents {
   answer: (data: { room_id:string, user_id: string, answer:string }) => void;
   player_ready: (data: { playerId: string }) => void;
-  leave_room: (data: {}) => void;
+  leave_room: (data: {room_id: string, user_id: string}) => void;
   all_players_in_lobby: (data: { room_id: string }) => void;
   join_room: (data: { room_id: string; user_id: string }) => void;
   start_quiz: (data: { room_id: string; user_id: string }) => void;
   update_leaderboard: (data:{room_id: string}) => void;
+  room_status: (data: {room_id: string}) => void;
 }
 
 export interface ServerToClientEvents {
   question_changed: (data: Question) => void;
-
 
   update_leaderboard: (data: PlayerLeaderBoard[]) => void;
   quiz_started: (data: Record<string, never>) => void;
@@ -47,4 +50,7 @@ export interface ServerToClientEvents {
   answered: (data: {user_id: string, correct_answered: 0 | 1}) => void;
   show_correct_answer: (data: {correct_answer: string}) => void;
   get_quest: (data: Question) => void;
+  endOfGame: (data: {}) => void;
+
+  room_status: (data: {status: RoomStatuses, question: Question}) => void;
 }

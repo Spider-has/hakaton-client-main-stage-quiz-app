@@ -1,9 +1,9 @@
 import {
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  type SelectChangeEvent,
+  FormLabel,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
   CircularProgress,
   Typography,
 } from "@mui/material";
@@ -19,10 +19,9 @@ export const CategorySelector = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const selectedId = useCreateQuizStore((state) => state.selectedCategoryId);
-
-  const setSelectedId = useCreateQuizStore(
-    (state) => state.setSelectedCategoryId
+  const selectedIds = useCreateQuizStore((state) => state.selectedCategoryIds);
+  const setSelectedIds = useCreateQuizStore(
+    (state) => state.setSelectedCategoryIds
   );
 
   useEffect(() => {
@@ -30,45 +29,54 @@ export const CategorySelector = () => {
       try {
         setLoading(true);
         const categoriesDTOs = await getCategories();
-        console.log(categoriesDTOs);
         setCategories(mapCategoryDTOtoCategory(categoriesDTOs.categories));
       } catch (err) {
         setCategories([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchCategories();
   }, []);
 
-  const handleChange = (e: SelectChangeEvent<string>) => {
-    setSelectedId(e.target.value);
+  const handleToggle = (id: string) => {
+    setSelectedIds(
+      selectedIds.includes(id)
+        ? selectedIds.filter((catId) => catId !== id)
+        : [...selectedIds, id]
+    );
   };
 
-  return (
-    <FormControl fullWidth>
-      {!loading && (
-        <>
-          <InputLabel>Категория</InputLabel>
+  if (loading) {
+    return (
+      <FormControl fullWidth>
+        <Typography>Загрузка категорий...</Typography>
+        <CircularProgress size={24} />
+      </FormControl>
+    );
+  }
 
-          <Select
-            value={selectedId || ""}
-            label="Категория"
-            onChange={handleChange}
-          >
-            {categories.map((cat) => (
-              <MenuItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </>
-      )}
-      {loading && (
-        <>
-          <Typography>Категории</Typography>
-          <CircularProgress />
-        </>
-      )}
+  return (
+    <FormControl component="fieldset" fullWidth>
+      <FormLabel component="legend">Категории</FormLabel>
+      <FormGroup>
+        {categories.length === 0 ? (
+          <Typography color="text.secondary">Нет доступных категорий</Typography>
+        ) : (
+          categories.map((cat) => (
+            <FormControlLabel
+              key={cat.id}
+              control={
+                <Checkbox
+                  checked={selectedIds.includes(cat.id)}
+                  onChange={() => handleToggle(cat.id)}
+                />
+              }
+              label={cat.name}
+            />
+          ))
+        )}
+      </FormGroup>
     </FormControl>
   );
 };

@@ -18,6 +18,8 @@ export const privateEndpoints = {
   user: {
     me: "user/me",
     logout: "user/logout",
+    getHistoryRooms: "/user/past_games",
+
   },
   categories: {
     getCategories: "categories/list",

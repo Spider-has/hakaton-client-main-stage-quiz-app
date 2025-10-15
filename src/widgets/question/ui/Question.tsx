@@ -107,11 +107,11 @@ export const CurrentQuestion = ({
   return (
     <Paper sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        {frontendQuestion.text}
+        {question.position}. {frontendQuestion.text}
       </Typography>
 
       {(isSubmitted || hasSubmittedAnswer) && selectedOptionId && (
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <Alert severity="info" sx={{ mb: 2 }}>
           <AlertTitle>Ответ отправлен</AlertTitle>
           Вы выбрали: «
           {frontendQuestion.options.find((opt) => opt.id === selectedOptionId)?.text}»

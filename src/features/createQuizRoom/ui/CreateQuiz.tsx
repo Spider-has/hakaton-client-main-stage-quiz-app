@@ -8,17 +8,17 @@ import { createQuizRoom } from "../api/createQuizRoom";
 
 export const CreateQuizForm = () => {
   const navigate = useNavigate();
-  const { selectedCategoryId, questionCount, reset } = useCreateQuizStore();
+  const { selectedCategoryIds, questionCount, reset } = useCreateQuizStore();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedCategoryId) return;
+    if (!selectedCategoryIds) return;
 
     setIsCreating(true);
     try {
       const roomCode = await createQuizRoom({
-        category_ids: [selectedCategoryId],
+        category_ids: selectedCategoryIds,
         count_questions: questionCount,
       });
       reset();
@@ -29,8 +29,7 @@ export const CreateQuizForm = () => {
     setIsCreating(false);
   };
 
-  const isFormValid = selectedCategoryId !== null && questionCount > 0;
-
+  const isFormValid = selectedCategoryIds.length > 0 && questionCount > 0;
   return (
     <Box
       sx={{

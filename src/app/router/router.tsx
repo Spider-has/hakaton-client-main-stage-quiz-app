@@ -6,6 +6,7 @@ import { AuthPage, QuizPage, RegisterPage } from "../../pages";
 import { PAGE_ENDPOINTS } from "../config/pageEnpoints";
 import { CreateRoomPage } from "../../pages/createRoomPage";
 import { QuizRoomPage } from "../../pages/quizRoom/ui/QuizRoomPage";
+import { HistoryPage } from "../../pages/history";
 
 const ProtectedRouteLayout = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -48,6 +49,7 @@ export const PrivateRoutes = () => (
   <Route element={<ProtectedRouteLayout />}>
     <Route path={PAGE_ENDPOINTS.quiz} element={<TopPanel />}>
       <Route index element={<QuizPage />} />
+      <Route path={'history'} element={<HistoryPage/>}/>
       <Route path={PAGE_ENDPOINTS.room.base}>
         <Route
           path={PAGE_ENDPOINTS.room.createRoom}

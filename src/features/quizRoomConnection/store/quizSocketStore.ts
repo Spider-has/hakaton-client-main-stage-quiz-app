@@ -23,11 +23,14 @@ export const useQuizRoomStore = create<QuizRoomState>((set, get) => ({
   reset: () =>
     set({
       roomId: null,
+       roomCode: null,
       isConnected: false,
       error: null,
       currentQuestion: null,
       players: [],
       isQuizStarted: false,
+      status: RoomStatus.WAITING,
+      owner: null,
     }),
 
    updatePlayers: (updatedPlayers) => {
@@ -37,12 +40,13 @@ export const useQuizRoomStore = create<QuizRoomState>((set, get) => ({
 
     const nextPlayers = currentPlayers.map(player =>
     {
-      if  (updatedMap.has(player.user_id)){
-    const newdata = updatedMap.get(player.user_id) 
-    return {...player, score: newdata?.score ?? player.score}}
-    return player
-    }
-    );
+      if (updatedMap.has(player.user_id)){
+        const newdata = updatedMap.get(player.user_id) 
+        return {...player, score: newdata?.score ?? player.score}
+      }
+      return player
+    });
+    
 
     set({ players: nextPlayers });
   },
@@ -82,7 +86,21 @@ export const useQuizRoomStore = create<QuizRoomState>((set, get) => ({
   },
   updateCurrentQuestion: (question) => set({ currentQuestion: question }),
 
-  setPlayers: (players) => set({ players }),
+  setPlayers: (newPlayersFromBackend) =>
+  set((state) => {
+    const mergedPlayers = newPlayersFromBackend.map(newPlayer => {
+      const oldPlayer = state.players.find(p => p.user_id === newPlayer.user_id);
+      if (oldPlayer) {
+        return {
+          ...newPlayer,
+          hasAnsweredCorrectly: oldPlayer.hasAnsweredCorrectly,
+        };
+      }
+      return newPlayer;
+    });
+
+    return { players: mergedPlayers };
+  }),
 
   startQuiz: () => set({ isQuizStarted: true }),
 }));

@@ -62,6 +62,7 @@ export const handleIncomingEvents = (socket: RefObject<QuizSocket | null>, roomI
     socket.current.on('show_correct_answer', ({correct_answer}) => {
       console.log('time to show correct answer: ', correct_answer);
       setRoomStatus(RoomStatus.CHECK_CORRECT_ANSWERS);
+      socket.current?.emit("all_players_in_lobby", ({room_id: roomId}))
     })
 
     socket.current.on('need_update_leaderboard', () => {
@@ -69,5 +70,17 @@ export const handleIncomingEvents = (socket: RefObject<QuizSocket | null>, roomI
       socket.current?.emit("update_leaderboard", ({room_id: roomId}))
     })
 
+     socket.current.on('endOfGame', () => {
+      console.log('end of game')
+      setRoomStatus(RoomStatus.FINISHED);
+      socket.current?.emit("update_leaderboard", ({room_id: roomId}))
+    })
+
+
+    socket.current.on('room_status', ({status, question}) => {
+      console.log('get room status')
+      setRoomStatus(status);
+      updateCurrentQuestion(question);
+    })
   }
 };

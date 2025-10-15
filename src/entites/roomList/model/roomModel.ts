@@ -4,6 +4,8 @@ export interface Room {
   currentPlayers: number;
   maxPlayers?: number;
   code: string;
+  questions: number,
+  categories: string[]
 }
 
 export interface RoomStore {

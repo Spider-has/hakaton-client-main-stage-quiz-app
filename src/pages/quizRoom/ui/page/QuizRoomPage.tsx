@@ -6,7 +6,7 @@ import {
   useQuizRoomConnection,
   useQuizRoomStore,
 } from "../../../../features";
-import { AnswerReviewArea, PlayerList, QuizRoomArea, RoomCodeCard } from "../../../../widgets";
+import { AnswerReviewArea, LeaderboardScreen, PlayerList, QuizRoomArea, RoomCodeCard } from "../../../../widgets";
 import { useEffect, useState } from "react";
 import { useUserStore } from "../../../../entites";
 import { getRoomIdResponse } from "../../../../features/quizRoomConnection/api/getRoomId";
@@ -51,7 +51,10 @@ export default function QuizRoomPageComponent() {
   const actions = useQuizRoomConnection(roomId, user?.id ?? null);
 
   useEffect(() => {
-    if (isConnected) actions.getAllPlayerInRoom(roomId ?? "");
+    if (isConnected) {
+      actions.getAllPlayerInRoom(roomId ?? "");
+      actions.roomStatus(roomId ?? "");
+    }
     console.log("connected: ", isConnected);
   }, [roomId, isConnected]);
 
@@ -59,11 +62,12 @@ export default function QuizRoomPageComponent() {
 
   const roomStatus = useQuizRoomStore((store) => store.status);
   const roomOwner = useQuizRoomStore(state => state.owner)
-
+  const reset = useQuizRoomStore(state => state.reset)
 
   const leaveRoomHandler = () => {
     if(roomId && user){
-      actions.leaveRoom()
+      actions.leaveRoom(roomId, user.id)
+      reset();
       navigate(PAGE_ENDPOINTS.quiz)
     }
   }
@@ -107,7 +111,7 @@ export default function QuizRoomPageComponent() {
                 players={players}
                 handleStartQuiz={startRoomHandler}
                 handleLeaveRoom={leaveRoomHandler} owner={roomOwner ?? {
-                   hasAnsweredCorrectly: false,
+                  hasAnsweredCorrectly: false,
                   user_id: "",
                   username: "",
                   score: 0,
@@ -146,7 +150,7 @@ export default function QuizRoomPageComponent() {
         )}
         {roomStatus === RoomStatus.QUESTION && <QuizRoomArea />}
         {roomStatus === RoomStatus.CHECK_CORRECT_ANSWERS && <AnswerReviewArea/>}
-        {roomStatus === RoomStatus.FINISHED && <></>}
+        {roomStatus === RoomStatus.FINISHED && <LeaderboardScreen players={players} handleLeaveRoom={leaveRoomHandler}/>}
       </Container>
     </QuizRoomContext.Provider>
   );

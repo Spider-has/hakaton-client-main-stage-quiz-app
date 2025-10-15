@@ -4,9 +4,10 @@ import type { QuizSocket } from "../socket/socket";
 export type QuizRoomActions = {
   submitAnswer: (room_id: string, user_id: string, answer: string) => void;
   sendReadySignal: (playerId: string) => void;
-  leaveRoom: () => void;
+  leaveRoom: (roomId: string, userId: string) => void;
   getAllPlayerInRoom: (room_id: string) => void;
   startGame: (room_id: string, user_id: string) => void;
+  roomStatus: (room_id: string) => void;
 };
 
 export const getQuizSocketActions = (
@@ -20,8 +21,9 @@ export const getQuizSocketActions = (
     socketRef.current?.emit("player_ready", { playerId });
   };
 
-  const leaveRoom = () => {
-    socketRef.current?.emit("leave_room", {});
+  const leaveRoom = (roomId: string, userId: string) => {
+    console.log(roomId, userId)
+    socketRef.current?.emit("leave_room", {room_id: roomId, user_id: userId});
   };
 
   const getAllPlayerInRoom = (room_id: string) => {
@@ -33,12 +35,19 @@ export const getQuizSocketActions = (
     socketRef.current?.emit("start_quiz", {room_id, user_id});
   };
 
+  const roomStatus = (room_id: string) => {
+    socketRef.current?.emit(  'room_status', {room_id: room_id});
+  };
+
+
+
   return {
     submitAnswer,
     sendReadySignal,
     leaveRoom,
     getAllPlayerInRoom,
-    startGame
+    startGame,
+    roomStatus
   };
 };
 

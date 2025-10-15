@@ -5,10 +5,13 @@ import {
   Button,
   Box,
   Container,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useUserStore } from "../..";
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
+import { PAGE_ENDPOINTS } from "../../../app/config/pageEnpoints";
 
 export const LogoutButton = () => {
   const logout = useUserStore((state) => state.logout);
@@ -39,6 +42,9 @@ export const LogoutButton = () => {
 
 export const TopPanel = () => {
   const user = useUserStore((state) => state.user);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <>
       <Container
@@ -46,16 +52,72 @@ export const TopPanel = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          width: `100%`,
-          minHeight: `100vh`,
-          padding: `0 !important`,
+          width: "100%",
+          minHeight: "100vh",
+          padding: "0 !important",
         }}
       >
         <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Toolbar
+            sx={{
+              flexWrap: isMobile ? "nowrap" : "wrap",
+              overflowX: isMobile ? "auto" : "visible",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography
+              variant={isMobile ? "subtitle1" : "h6"}
+              component="div"
+              noWrap
+            >
               {user?.name}
             </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: isMobile ? 2 : 3,
+                minWidth: 0, 
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Typography
+                component={Link}
+                to={PAGE_ENDPOINTS.quiz}
+                variant="h6"
+                sx={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: "bold",
+                  "&:hover": { textDecoration: "underline" },
+                  fontSize: {
+                    xs: "0.75rem",
+                    sm: "1.25rem", 
+                  },
+                }}
+              >
+                Главная
+              </Typography>
+              <Typography
+                component={Link}
+                to={PAGE_ENDPOINTS.history}
+                variant="h6"
+                sx={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: "bold",
+                  "&:hover": { textDecoration: "underline" },
+                  fontSize: {
+                      xs: "0.75rem",
+                    sm: "1.25rem",
+                  },
+                }}
+              >
+                История игр
+              </Typography>
+            </Box>
+
             <LogoutButton />
           </Toolbar>
         </AppBar>

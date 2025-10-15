@@ -2,6 +2,7 @@ export const PAGE_ENDPOINTS = {
   login: "/login",
   register: "/register",
   quiz: "/quiz",
+  history: "/quiz/history",
   room: {
     base: "room",
     createRoom: "create-room",

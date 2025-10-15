@@ -1,7 +1,7 @@
 export interface CreateQuizState {
-  selectedCategoryId: string | null;
+  selectedCategoryIds: string[];
   questionCount: number;
-  setSelectedCategoryId: (id: string) => void;
+  setSelectedCategoryIds: (ids: string[]) => void;
   setQuestionCount: (count: number) => void;
   reset: () => void;
 }

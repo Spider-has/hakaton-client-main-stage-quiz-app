@@ -3,7 +3,7 @@ import { CurrentQuestion } from "./Question";
 import { QuizRoomContext, useQuizRoomStore } from "../../../features";
 import { AnswerTimer } from "./AnswerTimer";
 import { PlayersLeaderboard } from "./LeaderBoard";
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useUserStore } from "../../../entites";
 
 type QuizRoomAreaProps = {};
@@ -27,6 +27,37 @@ export const QuizRoomArea = ({}: QuizRoomAreaProps) => {
       saveAnswer(user.id, answer)
     }
   }
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!currentQuestion) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      return;
+    }
+
+    if (!audioRef.current) {
+      const audio = new Audio("/sounds/clockTicking.mp3");
+      audio.loop = true; 
+      audio.volume = 0.3; 
+      audioRef.current = audio;
+    }
+
+    const audio = audioRef.current;
+    audio.play().catch((e) => {
+      console.warn("Не удалось воспроизвести звук:", e);
+    });
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [currentQuestion]);
+
   if (isMobile) {
     return (
       <Box
@@ -47,6 +78,7 @@ export const QuizRoomArea = ({}: QuizRoomAreaProps) => {
             currentQuestion ?? {
               id: "",
               text: "",
+              position: 0,
               options: [],
                 correct_answer: "",
                 time_limit: 0,
@@ -79,6 +111,7 @@ export const QuizRoomArea = ({}: QuizRoomAreaProps) => {
               currentQuestion ?? {
               id: "",
               text: "",
+              position: 0,
               options: [],
                 correct_answer: "",
                 time_limit: 0,
